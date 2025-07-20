@@ -33,19 +33,38 @@
 
       <!-- Formulario de ventas -->
       <div class="sales-form">
-        <input type="text" placeholder="Nombre del cliente">
+        <div class="form-group">
+        <label>Nombre Cliente</label>
+        <input type="text" id="nombreCliente" placeholder="Nombre del Cliente">
+        </div>
+        <label>Producto</label>
+       <div class="form-group">
         <select>
           <option value="">Seleccione un producto</option>
           <option value="Café tostado">Café tostado</option>
           <option value="Materia prima A">Materia prima A</option>
           <option value="Envases">Envases</option>
         </select>
-        <input type="number" placeholder="Cantidad">
+	</div>
+        <div class="form-group">
+        <label>Cantidad</label> 
+        <input type="text" id="Cantidad" placeholder="Cantidad">
+        </div>
+        <div class="form-group">
+        <label>Precio Unitario</label> 
+        <input type="text" id="precioUnitario" placeholder="Precio Unitario">
+        </div>
+        <div class="form-group">
+        <label>Valor Total</label> 
+        <input type="text" id="valorTotal" placeholder="Total Venta">
+        </div>        
+        <div class="form-group">
+        <label>Fecha</label>               
         <input type="date">
+        </div>
         <button class="confirmar">Confirmar Venta</button>
         <button class="cancelar">Cancelar</button>
-      </div>
-
+        </div>
       <!-- Resumen de la venta -->
       <div class="sales-summary">
         <h2>Resumen de la Venta</h2>
