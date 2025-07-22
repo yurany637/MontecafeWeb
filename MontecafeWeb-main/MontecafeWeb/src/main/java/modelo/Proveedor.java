@@ -8,10 +8,11 @@ public class Proveedor {
     private String correo;
     private String direccion;
 
+    // Constructor vacío
     public Proveedor() {}
 
-    public Proveedor(int id, String nombre, String contacto, String correo, String direccion) {
-        this.id = id;
+    // Constructor con parámetros
+    public Proveedor(String nombre, String contacto, String correo, String direccion) {
         this.nombre = nombre;
         this.contacto = contacto;
         this.correo = correo;

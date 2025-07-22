@@ -21,11 +21,21 @@
     </properties>
 
     <dependencies>
+        <!-- Dependencia Jakarta EE -->
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
-            <version>${jakartaee}</version>
+            <version>8.0.0</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- MySQL conector local (NO lo descarga de Maven Central) -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.0.33</version>
+            <scope>system</scope>
+            <systemPath>C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\lib\mysql-connector-j-8.0.33\mysql-connector-j-8.0.33.jar</systemPath>
         </dependency>
     </dependencies>
 
