@@ -1,34 +1,31 @@
 
 package controlador;
 
-import java.io.IOException;
-import javax.servlet.*;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
 import dao.ClientesDAO;
 import modelo.Clientes;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
 
-@WebServlet("/ClienteServlet")
+@WebServlet("/ClienteServlet") // ✔ IMPORTANTE: este nombre exacto
 public class ClientesServlet extends HttpServlet {
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String nombre = request.getParameter("nombre");
         String telefono = request.getParameter("telefono");
         String correo = request.getParameter("correo");
         String direccion = request.getParameter("direccion");
 
-        Clientes c = new Clientes(0, nombre, telefono, correo, direccion);
+        Clientes cliente = new Clientes(nombre, telefono, correo, direccion);
+        ClientesDAO dao = new ClientesDAO();
 
         try {
-            ClientesDAO dao = new ClientesDAO();
-            dao.registrar(c);
-            request.setAttribute("mensaje", "Cliente registrado correctamente");
+            dao.registrar(cliente);
+            response.sendRedirect("vistas/Clientes.jsp?mensaje=ok");
         } catch (Exception e) {
-            request.setAttribute("mensaje", "Error: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect("vistas/Clientes.jsp?mensaje=error");
         }
-
-        request.getRequestDispatcher("vistas/respuesta.jsp").forward(request, response);
     }
 }

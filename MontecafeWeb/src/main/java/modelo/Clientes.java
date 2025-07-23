@@ -10,8 +10,7 @@ public class Clientes {
 
     public Clientes() {}
 
-    public Clientes(int id, String nombre, String telefono, String correo, String direccion) {
-        this.id = id;
+    public Clientes(String nombre, String telefono, String correo, String direccion) {
         this.nombre = nombre;
         this.telefono = telefono;
         this.correo = correo;
@@ -19,7 +18,6 @@ public class Clientes {
     }
 
     // Getters y Setters
-
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
