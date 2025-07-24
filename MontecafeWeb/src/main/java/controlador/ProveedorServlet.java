@@ -1,34 +1,35 @@
 
 package controlador;
 
-import java.io.IOException;
+import dao.ProveedorDAO;
+import modelo.Proveedor;
 import javax.servlet.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-import dao.ProveedorDAO;
-import modelo.Proveedor;
+import java.io.IOException;
 
 @WebServlet("/ProveedorServlet")
 public class ProveedorServlet extends HttpServlet {
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        String nombre = request.getParameter("nombre");
-        String contacto = request.getParameter("contacto");
-        String correo = request.getParameter("correo");
-        String direccion = request.getParameter("direccion");
-
-        Proveedor p = new Proveedor(0, nombre, contacto, correo, direccion);
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ProveedorDAO dao = new ProveedorDAO();
+        Proveedor p = new Proveedor();
 
         try {
-            ProveedorDAO dao = new ProveedorDAO();
-            dao.registrar(p);
-            request.setAttribute("mensaje", "Proveedor registrado correctamente");
-        } catch (Exception e) {
-            request.setAttribute("mensaje", "Error: " + e.getMessage());
-        }
+            p.setNombre(request.getParameter("nombre"));
+            p.setContacto(request.getParameter("telefono"));
+            p.setCorreo(request.getParameter("correo"));
+            p.setDireccion(request.getParameter("ciudad"));
 
-        request.getRequestDispatcher("vistas/respuesta.jsp").forward(request, response);
+            boolean exito = dao.registrar(p);
+            if (exito) {
+                response.sendRedirect("vistas/Proveedores.jsp?mensaje=ok");
+            } else {
+                response.sendRedirect("vistas/Proveedores.jsp?mensaje=error");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("vistas/Proveedores.jsp?mensaje=error");
+        }
     }
 }
