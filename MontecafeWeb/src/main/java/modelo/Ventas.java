@@ -3,32 +3,19 @@ package modelo;
 
 public class Ventas {
     private int id;
-    private String nombreCliente;
+    private String cliente;
     private String producto;
     private int cantidad;
     private double precioUnitario;
     private double total;
     private String fecha;
 
-    public Ventas() {}
-
-    public Ventas(int id, String nombreCliente, String producto, int cantidad, double precioUnitario, double total, String fecha) {
-        this.id = id;
-        this.nombreCliente = nombreCliente;
-        this.producto = producto;
-        this.cantidad = cantidad;
-        this.precioUnitario = precioUnitario;
-        this.total = total;
-        this.fecha = fecha;
-    }
-
     // Getters y Setters
-
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public String getNombreCliente() { return nombreCliente; }
-    public void setNombreCliente(String nombreCliente) { this.nombreCliente = nombreCliente; }
+    public String getCliente() { return cliente; }
+    public void setCliente(String cliente) { this.cliente = cliente; }
 
     public String getProducto() { return producto; }
     public void setProducto(String producto) { this.producto = producto; }

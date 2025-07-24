@@ -1,37 +1,49 @@
-
 package controlador;
 
-import java.io.IOException;
-import javax.servlet.*;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
 import dao.VentasDAO;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import modelo.Ventas;
 
-@WebServlet("/VentaServlet")
+
+@WebServlet("/VentasServlet")
 public class VentasServlet extends HttpServlet {
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        String nombreCliente = request.getParameter("nombreCliente");
-        String producto = request.getParameter("producto");
-        int cantidad = Integer.parseInt(request.getParameter("cantidad"));
-        double precioUnitario = Double.parseDouble(request.getParameter("precioUnitario"));
-        double total = Double.parseDouble(request.getParameter("total"));
-        String fecha = request.getParameter("fecha");
-
-        Ventas v = new Ventas(0, nombreCliente, producto, cantidad, precioUnitario, total, fecha);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Ventas v = new Ventas();
+        VentasDAO dao = new VentasDAO();
 
         try {
-            VentasDAO dao = new VentasDAO();
+            String cliente = request.getParameter("cliente");
+            String producto = request.getParameter("producto");
+            int cantidad = Integer.parseInt(request.getParameter("cantidad"));
+            double precioUnitario = Double.parseDouble(request.getParameter("precioUnitario"));
+            String fecha = request.getParameter("fecha");
+
+            double total = cantidad * precioUnitario;
+
+            v.setCliente(cliente);
+            v.setProducto(producto);
+            v.setCantidad(cantidad);
+            v.setPrecioUnitario(precioUnitario);
+            v.setTotal(total);
+            v.setFecha(fecha);
+
             dao.registrar(v);
-            request.setAttribute("mensaje", "Venta registrada correctamente");
         } catch (Exception e) {
-            request.setAttribute("mensaje", "Error: " + e.getMessage());
+            e.printStackTrace();
         }
 
-        request.getRequestDispatcher("vistas/respuesta.jsp").forward(request, response);
+        request.setAttribute("lista", dao.listar());
+        request.getRequestDispatcher("vistas/ventas.jsp").forward(request, response);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        VentasDAO dao = new VentasDAO();
+        request.setAttribute("lista", dao.listar());
+        request.getRequestDispatcher("vistas/ventas.jsp").forward(request, response);
     }
 }
