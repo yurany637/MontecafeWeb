@@ -33,7 +33,7 @@ El sistema incluye:
 - **Base de Datos:** MySQL 8+
 - **Frontend:** HTML5, CSS3, JavaScript
 - **IDE:** NetBeans
-- **Versionamiento:** Git y GitHub
+- **Versionamiento:** Git y GitHub - link repositorio        	https://github.com/yurany637/MontecafeWeb.git
 - **Gestión de dependencias:** Maven
 
 ---
