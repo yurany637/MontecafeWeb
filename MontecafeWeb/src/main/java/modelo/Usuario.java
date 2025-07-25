@@ -2,18 +2,26 @@
 package modelo;
 
 public class Usuario {
+    private int id;
     private String nombreUsuario;
-    private String password;
+    private String contrasena;
     private String rol;
 
-    public Usuario() {}
-
-    public Usuario(String nombreUsuario, String password) {
-        this.nombreUsuario = nombreUsuario;
-        this.password = password;
+    public Usuario() {
     }
 
-    // Getters y Setters
+    public Usuario(String nombreUsuario, String contrasena) {
+        this.nombreUsuario = nombreUsuario;
+        this.contrasena = contrasena;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getNombreUsuario() {
         return nombreUsuario;
@@ -23,12 +31,12 @@ public class Usuario {
         this.nombreUsuario = nombreUsuario;
     }
 
-    public String getPassword() {
-        return password;
+    public String getContrasena() {
+        return contrasena;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
     public String getRol() {

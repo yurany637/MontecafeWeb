@@ -1,69 +1,106 @@
 
 package dao;
 
-import modelo.Ventas;
+import modelo.Venta;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class VentasDAO {
-    String url = "jdbc:mysql://localhost:3306/montecafeweb?useSSL=false&serverTimezone=UTC";
-    String user = "root";
-    String password = "1234";
 
-    public boolean registrar(Ventas v) {
-        String sql = "INSERT INTO ventas (cliente, producto, cantidad, precioUnitario, total, fecha) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String URL = "jdbc:mysql://localhost:3306/montecafeweb?useSSL=false&serverTimezone=UTC";
+    private static final String USER = "root";
+    private static final String PASSWORD = "1234";
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(url, user, password);
-            PreparedStatement ps = con.prepareStatement(sql);
+    private static final String SQL_INSERT =
+        "INSERT INTO ventas (cliente, producto, cantidad, total) VALUES (?, ?, ?, ?)";
+    private static final String SQL_UPDATE =
+        "UPDATE ventas SET cliente=?, producto=?, cantidad=?, total=? WHERE id=?";
+    private static final String SQL_DELETE =
+        "DELETE FROM ventas WHERE id=?";
+    private static final String SQL_FIND_ALL =
+        "SELECT * FROM ventas";
+    private static final String SQL_FIND_BY_ID =
+        "SELECT * FROM ventas WHERE id=?";
 
-            ps.setString(1, v.getCliente());
-            ps.setString(2, v.getProducto());
-            ps.setInt(3, v.getCantidad());
-            ps.setDouble(4, v.getPrecioUnitario());
-            ps.setDouble(5, v.getTotal());
-            ps.setString(6, v.getFecha());
-
-            int resultado = ps.executeUpdate();
-            ps.close();
-            con.close();
-
-            return resultado > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public List<Ventas> listar() {
-        List<Ventas> lista = new ArrayList<>();
-        String sql = "SELECT * FROM ventas";
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(url, user, password);
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-
+    public List<Venta> listar() {
+        List<Venta> lista = new ArrayList<>();
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_FIND_ALL);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                Ventas v = new Ventas();
+                Venta v = new Venta();
                 v.setId(rs.getInt("id"));
                 v.setCliente(rs.getString("cliente"));
                 v.setProducto(rs.getString("producto"));
                 v.setCantidad(rs.getInt("cantidad"));
-                v.setPrecioUnitario(rs.getDouble("precioUnitario")); // 👈 Asegúrate que en la tabla esté como 'precioUnitario'
                 v.setTotal(rs.getDouble("total"));
-                v.setFecha(rs.getString("fecha"));
                 lista.add(v);
             }
-
-            rs.close();
-            con.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return lista;
+    }
+
+    public Venta obtenerPorId(int id) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_FIND_BY_ID)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Venta v = new Venta();
+                    v.setId(rs.getInt("id"));
+                    v.setCliente(rs.getString("cliente"));
+                    v.setProducto(rs.getString("producto"));
+                    v.setCantidad(rs.getInt("cantidad"));
+                    v.setTotal(rs.getDouble("total"));
+                    return v;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean insertar(Venta v) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_INSERT)) {
+            ps.setString(1, v.getCliente());
+            ps.setString(2, v.getProducto());
+            ps.setInt(3, v.getCantidad());
+            ps.setDouble(4, v.getTotal());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean actualizar(Venta v) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_UPDATE)) {
+            ps.setString(1, v.getCliente());
+            ps.setString(2, v.getProducto());
+            ps.setInt(3, v.getCantidad());
+            ps.setDouble(4, v.getTotal());
+            ps.setInt(5, v.getId());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean eliminar(int id) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_DELETE)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

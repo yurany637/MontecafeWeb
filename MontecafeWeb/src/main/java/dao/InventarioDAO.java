@@ -1,66 +1,48 @@
 
-package dao;
+package modelo;
 
-import java.sql.*;
-import java.util.*;
-import modelo.Inventario;
+public class Inventario {
+    private int id;
+    private String producto;
+    private int cantidad;
 
-public class InventarioDAO {
+    // Constructor vacío
+    public Inventario() {}
 
-    String url = "jdbc:mysql://localhost:3306/montecafeweb?useSSL=false&serverTimezone=UTC";
-    String user = "root";
-    String password = "1234"; // Ajusta si es necesario
-
-    public boolean registrar(Inventario inv) {
-        String sql = "INSERT INTO inventario (producto, categoria, stock, unidad, estado) VALUES (?, ?, ?, ?, ?)";
-        boolean exito = false;
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(url, user, password);
-                 PreparedStatement ps = con.prepareStatement(sql)) {
-
-                ps.setString(1, inv.getProducto());
-                ps.setString(2, inv.getCategoria());
-                ps.setInt(3, inv.getStock());
-                ps.setString(4, inv.getUnidad());
-                ps.setString(5, inv.getEstado());
-
-                int filasAfectadas = ps.executeUpdate();
-                exito = (filasAfectadas > 0);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return exito;
+    // Constructor con parámetros
+    public Inventario(int id, String producto, int cantidad) {
+        this.id = id;
+        this.producto = producto;
+        this.cantidad = cantidad;
     }
 
-    public List<Inventario> listar() {
-        List<Inventario> lista = new ArrayList<>();
-        String sql = "SELECT * FROM inventario";
+    public Inventario(String producto, int cantidad) {
+        this.producto = producto;
+        this.cantidad = cantidad;
+    }
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(url, user, password);
-                 Statement st = con.createStatement();
-                 ResultSet rs = st.executeQuery(sql)) {
+    // Getters y Setters
+    public int getId() {
+        return id;
+    }
 
-                while (rs.next()) {
-                    Inventario inv = new Inventario();
-                    inv.setId(rs.getInt("id"));
-                    inv.setProducto(rs.getString("producto"));
-                    inv.setCategoria(rs.getString("categoria"));
-                    inv.setStock(rs.getInt("stock"));
-                    inv.setUnidad(rs.getString("unidad"));
-                    inv.setEstado(rs.getString("estado"));
-                    lista.add(inv);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-        return lista;
+    public String getProducto() {
+        return producto;
+    }
+
+    public void setProducto(String producto) {
+        this.producto = producto;
+    }
+
+    public int getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
     }
 }

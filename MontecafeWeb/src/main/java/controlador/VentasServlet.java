@@ -1,49 +1,67 @@
+
 package controlador;
 
-import dao.VentasDAO;
-import java.io.IOException;
+import dao.VentaDAO;
+import modelo.Venta;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import modelo.Ventas;
-
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/VentasServlet")
 public class VentasServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Ventas v = new Ventas();
-        VentasDAO dao = new VentasDAO();
+    private VentaDAO dao = new VentaDAO();
 
-        try {
-            String cliente = request.getParameter("cliente");
-            String producto = request.getParameter("producto");
-            int cantidad = Integer.parseInt(request.getParameter("cantidad"));
-            double precioUnitario = Double.parseDouble(request.getParameter("precioUnitario"));
-            String fecha = request.getParameter("fecha");
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-            double total = cantidad * precioUnitario;
+        String action = request.getParameter("action");
+        if (action == null) action = "listar";
 
-            v.setCliente(cliente);
-            v.setProducto(producto);
-            v.setCantidad(cantidad);
-            v.setPrecioUnitario(precioUnitario);
-            v.setTotal(total);
-            v.setFecha(fecha);
+        switch (action) {
+            case "editar":
+                int idEditar = Integer.parseInt(request.getParameter("id"));
+                Venta ventaEditar = dao.obtenerPorId(idEditar);
+                request.setAttribute("venta", ventaEditar);
+                request.getRequestDispatcher("vistas/ventas-form.jsp").forward(request, response);
+                break;
 
-            dao.registrar(v);
-        } catch (Exception e) {
-            e.printStackTrace();
+            case "eliminar":
+                int idEliminar = Integer.parseInt(request.getParameter("id"));
+                dao.eliminar(idEliminar);
+                response.sendRedirect("VentasServlet");
+                break;
+
+            default: // listar
+                List<Venta> lista = dao.listar();
+                request.setAttribute("listaVentas", lista);
+                request.getRequestDispatcher("vistas/ventas.jsp").forward(request, response);
+                break;
         }
-
-        request.setAttribute("lista", dao.listar());
-        request.getRequestDispatcher("vistas/ventas.jsp").forward(request, response);
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        VentasDAO dao = new VentasDAO();
-        request.setAttribute("lista", dao.listar());
-        request.getRequestDispatcher("vistas/ventas.jsp").forward(request, response);
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String id = request.getParameter("id");
+        String cliente = request.getParameter("cliente");
+        String producto = request.getParameter("producto");
+        int cantidad = Integer.parseInt(request.getParameter("cantidad"));
+        double total = Double.parseDouble(request.getParameter("total"));
+
+        Venta venta = new Venta();
+        if (id != null && !id.isEmpty()) {
+            venta.setId(Integer.parseInt(id));
+        }
+        venta.setCliente(cliente);
+        venta.setProducto(producto);
+        venta.setCantidad(cantidad);
+        venta.setTotal(total);
+
+        dao.guardar(venta);
+        response.sendRedirect("VentasServlet");
     }
 }

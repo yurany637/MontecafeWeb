@@ -3,62 +3,99 @@ package dao;
 
 import modelo.Proveedor;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProveedorDAO {
-    String url = "jdbc:mysql://localhost:3306/montecafeweb";
-    String user = "root";
-    String password = "1234";
+    private static final String URL = "jdbc:mysql://localhost:3306/montecafeweb?useSSL=false&serverTimezone=UTC";
+    private static final String USER = "root";
+    private static final String PASSWORD = "1234";
 
-    public boolean registrar(Proveedor p) {
-        String sql = "INSERT INTO proveedores (nombre, contacto, correo, direccion) VALUES (?, ?, ?, ?)";
+    private static final String SQL_INSERT = 
+        "INSERT INTO proveedores (nombre, telefono, correo) VALUES (?, ?, ?)";
+    private static final String SQL_UPDATE = 
+        "UPDATE proveedores SET nombre=?, telefono=?, correo=? WHERE id=?";
+    private static final String SQL_DELETE = 
+        "DELETE FROM proveedores WHERE id=?";
+    private static final String SQL_SELECT_ALL = 
+        "SELECT * FROM proveedores";
+    private static final String SQL_SELECT_BY_ID = 
+        "SELECT * FROM proveedores WHERE id=?";
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            int resultado;
-            try (Connection con = DriverManager.getConnection(url, user, password)) {
-                PreparedStatement ps = con.prepareStatement(sql);
-                ps.setString(1, p.getNombre());
-                ps.setString(2, p.getContacto());
-                ps.setString(3, p.getCorreo());
-                ps.setString(4, p.getDireccion());
-                resultado = ps.executeUpdate();
-                ps.close();
-            }
-
-            return resultado > 0;
+    public boolean insertar(Proveedor p) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_INSERT)) {
+            ps.setString(1, p.getNombre());
+            ps.setString(2, p.getTelefono());
+            ps.setString(3, p.getCorreo());
+            return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
 
+    public boolean actualizar(Proveedor p) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_UPDATE)) {
+            ps.setString(1, p.getNombre());
+            ps.setString(2, p.getTelefono());
+            ps.setString(3, p.getCorreo());
+            ps.setInt(4, p.getId());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean eliminar(int id) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_DELETE)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Proveedor obtenerPorId(int id) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_SELECT_BY_ID)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Proveedor p = new Proveedor();
+                    p.setId(rs.getInt("id"));
+                    p.setNombre(rs.getString("nombre"));
+                    p.setTelefono(rs.getString("telefono"));
+                    p.setCorreo(rs.getString("correo"));
+                    return p;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<Proveedor> listar() {
         List<Proveedor> lista = new ArrayList<>();
-        String sql = "SELECT * FROM proveedores";
-
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(url, user, password);
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_SELECT_ALL);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Proveedor p = new Proveedor();
                 p.setId(rs.getInt("id"));
                 p.setNombre(rs.getString("nombre"));
-                p.setContacto(rs.getString("contacto"));
+                p.setTelefono(rs.getString("telefono"));
                 p.setCorreo(rs.getString("correo"));
-                p.setDireccion(rs.getString("direccion"));
                 lista.add(p);
             }
-
-            rs.close();
-            con.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return lista;
     }
 }

@@ -1,4 +1,3 @@
-
 package dao;
 
 import java.sql.*;
@@ -12,30 +11,31 @@ public class ConfiguracionDAO {
     private static final String USER = "root";
     private static final String PASSWORD = "1234";
 
-    private static final String SQL_INSERT =
-        "INSERT INTO configuracion (nombreUsuario, correo, password) VALUES (?, ?, ?)";
-    private static final String SQL_UPDATE =
-        "UPDATE configuracion SET nombreUsuario = ?, correo = ?, password = ? WHERE id = ?";
-    private static final String SQL_FIND_BY_ID =
-        "SELECT id, nombreUsuario, correo, password FROM configuracion WHERE id = ?";
-    private static final String SQL_FIND_ALL =
-        "SELECT id, nombreUsuario, correo, password FROM configuracion";
-    private static final String SQL_DELETE =
-        "DELETE FROM configuracion WHERE id = ?";
+    private static final String SQL_INSERT
+            = "INSERT INTO configuracion (nombreUsuario, correo, password) VALUES (?, ?, ?)";
+    private static final String SQL_UPDATE
+            = "UPDATE configuracion SET nombreUsuario = ?, correo = ?, password = ? WHERE id = ?";
+    private static final String SQL_FIND_BY_ID
+            = "SELECT id, nombreUsuario, correo, password FROM configuracion WHERE id = ?";
+    private static final String SQL_FIND_ALL
+            = "SELECT id, nombreUsuario, correo, password FROM configuracion";
+    private static final String SQL_DELETE
+            = "DELETE FROM configuracion WHERE id = ?";
 
     // INSERT - devuelve el id generado
     public int insertar(Configuracion c) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
-                 PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
+            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement ps = con.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
 
                 ps.setString(1, c.getNombreUsuario());
                 ps.setString(2, c.getCorreo());
                 ps.setString(3, c.getPassword());
 
                 int filas = ps.executeUpdate();
-                if (filas == 0) return 0;
+                if (filas == 0) {
+                    return 0;
+                }
 
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
@@ -55,8 +55,7 @@ public class ConfiguracionDAO {
     public boolean actualizar(Configuracion c) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
-                 PreparedStatement ps = con.prepareStatement(SQL_UPDATE)) {
+            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement ps = con.prepareStatement(SQL_UPDATE)) {
 
                 ps.setString(1, c.getNombreUsuario());
                 ps.setString(2, c.getCorreo());
@@ -74,8 +73,7 @@ public class ConfiguracionDAO {
     public Configuracion obtenerPorId(int id) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
-                 PreparedStatement ps = con.prepareStatement(SQL_FIND_BY_ID)) {
+            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement ps = con.prepareStatement(SQL_FIND_BY_ID)) {
 
                 ps.setInt(1, id);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -100,9 +98,7 @@ public class ConfiguracionDAO {
         List<Configuracion> lista = new ArrayList<>();
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
-                 PreparedStatement ps = con.prepareStatement(SQL_FIND_ALL);
-                 ResultSet rs = ps.executeQuery()) {
+            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement ps = con.prepareStatement(SQL_FIND_ALL); ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
                     Configuracion c = new Configuracion();
@@ -123,8 +119,7 @@ public class ConfiguracionDAO {
     public boolean eliminar(int id) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
-                 PreparedStatement ps = con.prepareStatement(SQL_DELETE)) {
+            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement ps = con.prepareStatement(SQL_DELETE)) {
 
                 ps.setInt(1, id);
                 return ps.executeUpdate() > 0;
@@ -143,4 +138,32 @@ public class ConfiguracionDAO {
             return actualizar(c);
         }
     }
+    // LOGIN: verificar si existe el usuario
+
+    public Configuracion autenticar(String nombreUsuario, String password) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            String sql = "SELECT id, nombreUsuario, correo, password FROM configuracion WHERE nombreUsuario = ? AND password = ?";
+            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD); PreparedStatement ps = con.prepareStatement(sql)) {
+
+                ps.setString(1, nombreUsuario);
+                ps.setString(2, password);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        Configuracion c = new Configuracion();
+                        c.setId(rs.getInt("id"));
+                        c.setNombreUsuario(rs.getString("nombreUsuario"));
+                        c.setCorreo(rs.getString("correo"));
+                        c.setPassword(rs.getString("password"));
+                        return c;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

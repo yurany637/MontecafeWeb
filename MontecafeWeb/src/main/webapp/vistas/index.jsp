@@ -12,7 +12,6 @@
     <div class="login-box">
       <h2>Montecafe</h2>
 
-      <!-- Mostrar mensaje de error si existe -->
       <%
         String error = request.getParameter("error");
         if (error != null) {
@@ -24,33 +23,20 @@
       %>
               <p style="color: red;">Por favor completa todos los campos.</p>
       <%
-            } else if (error.equals("servidor")) {
-      %>
-              <p style="color: red;">Error en el servidor. Intenta más tarde.</p>
-      <%
-            } else if (error.equals("rol")) {
-      %>
-              <p style="color: red;">Rol no autorizado.</p>
-      <%
             }
         }
       %>
 
-      <!-- Formulario corregido -->
       <form id="formLogin" method="post" action="../LoginServlet">
-
         <label for="usuario">Usuario</label>
-        <input type="text" name="usuario" id="usuario" placeholder="Ingrese su usuario" required>
+        <input type="text" name="usuario" id="usuario" required>
 
         <label for="contrasena">Contraseña</label>
-        <input type="password" name="contrasena" id="contrasena" placeholder="********" required>
+        <input type="password" name="contrasena" id="contrasena" required>
 
         <button type="submit">Iniciar sesión</button>
       </form>
-
     </div>
   </div>
-
-  <script src="../js/script.js" defer></script>
 </body>
 </html>

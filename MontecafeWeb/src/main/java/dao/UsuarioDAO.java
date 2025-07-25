@@ -1,41 +1,41 @@
 
 package dao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import modelo.Usuario;
+import java.sql.*;
 
 public class UsuarioDAO {
 
-    String url = "jdbc:mysql://localhost:3306/montecafeweb?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC";
-    String user = "root";
-    String password = "TuContraseña";
+    private static final String URL = "jdbc:mysql://localhost:3306/montecafeweb?useSSL=false&serverTimezone=UTC";
+    private static final String USER = "root";
+    private static final String PASSWORD = "1234";
 
-    public Usuario validar(Usuario usuario) throws Exception {
-        Usuario resultado = null;
+    private static final String SQL_VALIDAR = 
+        "SELECT * FROM usuarios WHERE nombreUsuario=? AND contrasena=?";
 
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection con = DriverManager.getConnection(url, user, password);
+    public Usuario validar(Usuario user) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+                 PreparedStatement ps = con.prepareStatement(SQL_VALIDAR)) {
 
-        String sql = "SELECT * FROM configuracion WHERE nombre_usuario = ? AND password = ?";
-        PreparedStatement ps = con.prepareStatement(sql);
-        ps.setString(1, usuario.getNombreUsuario());
-        ps.setString(2, usuario.getPassword());
+                ps.setString(1, user.getNombreUsuario());
+                ps.setString(2, user.getContrasena());
 
-        ResultSet rs = ps.executeQuery();
-
-        if (rs.next()) {
-            resultado = new Usuario();
-            resultado.setNombreUsuario(rs.getString("nombre_usuario"));
-            resultado.setRol(rs.getString("rol"));
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        Usuario u = new Usuario();
+                        u.setId(rs.getInt("id"));
+                        u.setNombreUsuario(rs.getString("nombreUsuario"));
+                        u.setContrasena(rs.getString("contrasena"));
+                        u.setRol(rs.getString("rol"));
+                        return u;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        rs.close();
-        ps.close();
-        con.close();
-
-        return resultado; // Si no encontró nada, devuelve null.
+        return null;
     }
 }

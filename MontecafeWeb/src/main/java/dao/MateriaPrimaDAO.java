@@ -3,57 +3,100 @@ package dao;
 
 import modelo.MateriaPrima;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MateriaPrimaDAO {
-    String url = "jdbc:mysql://localhost:3306/montecafeweb?useSSL=false&serverTimezone=UTC";
-    String user = "root";
-    String password = "1234"; // Ajusta tu contraseña
 
-    public boolean registrar(MateriaPrima m) {
-        String sql = "INSERT INTO materia_prima (nombre, unidad, stock) VALUES (?, ?, ?)";
+    private static final String URL = "jdbc:mysql://localhost:3306/montecafeweb?useSSL=false&serverTimezone=UTC";
+    private static final String USER = "root";
+    private static final String PASSWORD = "1234";
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(url, user, password);
-                 PreparedStatement ps = con.prepareStatement(sql)) {
-
-                ps.setString(1, m.getNombre());
-                ps.setString(2, m.getUnidad());
-                ps.setInt(3, m.getStock());
-
-                ps.executeUpdate();
-                return true;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+    private static final String SQL_INSERT =
+        "INSERT INTO materia_prima (nombre, cantidad, unidad) VALUES (?, ?, ?)";
+    private static final String SQL_UPDATE =
+        "UPDATE materia_prima SET nombre=?, cantidad=?, unidad=? WHERE id=?";
+    private static final String SQL_DELETE =
+        "DELETE FROM materia_prima WHERE id=?";
+    private static final String SQL_FIND_ALL =
+        "SELECT * FROM materia_prima";
+    private static final String SQL_FIND_BY_ID =
+        "SELECT * FROM materia_prima WHERE id=?";
 
     public List<MateriaPrima> listar() {
         List<MateriaPrima> lista = new ArrayList<>();
-        String sql = "SELECT * FROM materia_prima";
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_FIND_ALL);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                MateriaPrima mp = new MateriaPrima();
+                mp.setId(rs.getInt("id"));
+                mp.setNombre(rs.getString("nombre"));
+                mp.setCantidad(rs.getInt("cantidad"));
+                mp.setUnidad(rs.getString("unidad"));
+                lista.add(mp);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lista;
+    }
 
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            try (Connection con = DriverManager.getConnection(url, user, password);
-                 Statement st = con.createStatement();
-                 ResultSet rs = st.executeQuery(sql)) {
-
-                while (rs.next()) {
-                    MateriaPrima m = new MateriaPrima();
-                    m.setId(rs.getInt("id"));
-                    m.setNombre(rs.getString("nombre"));
-                    m.setUnidad(rs.getString("unidad"));
-                    m.setStock(rs.getInt("stock"));
-                    lista.add(m);
+    public MateriaPrima obtenerPorId(int id) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_FIND_BY_ID)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    MateriaPrima mp = new MateriaPrima();
+                    mp.setId(rs.getInt("id"));
+                    mp.setNombre(rs.getString("nombre"));
+                    mp.setCantidad(rs.getInt("cantidad"));
+                    mp.setUnidad(rs.getString("unidad"));
+                    return mp;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
+    }
 
-        return lista;
+    public boolean insertar(MateriaPrima mp) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_INSERT)) {
+            ps.setString(1, mp.getNombre());
+            ps.setInt(2, mp.getCantidad());
+            ps.setString(3, mp.getUnidad());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean actualizar(MateriaPrima mp) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_UPDATE)) {
+            ps.setString(1, mp.getNombre());
+            ps.setInt(2, mp.getCantidad());
+            ps.setString(3, mp.getUnidad());
+            ps.setInt(4, mp.getId());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean eliminar(int id) {
+        try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement ps = con.prepareStatement(SQL_DELETE)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

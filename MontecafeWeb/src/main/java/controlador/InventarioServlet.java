@@ -3,61 +3,61 @@ package controlador;
 
 import dao.InventarioDAO;
 import modelo.Inventario;
-
-import java.io.IOException;
-import javax.servlet.*;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
+import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/InventarioServlet")
 public class InventarioServlet extends HttpServlet {
+    private InventarioDAO dao = new InventarioDAO();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String action = request.getParameter("action");
+        if (action == null) action = "listar";
+
+        switch (action) {
+            case "editar":
+                int idEditar = Integer.parseInt(request.getParameter("id"));
+                Inventario inventarioEditar = dao.obtenerPorId(idEditar);
+                request.setAttribute("inventario", inventarioEditar);
+                request.getRequestDispatcher("vistas/inventario-form.jsp").forward(request, response);
+                break;
+
+            case "eliminar":
+                int idEliminar = Integer.parseInt(request.getParameter("id"));
+                dao.eliminar(idEliminar);
+                response.sendRedirect("InventarioServlet");
+                break;
+
+            default: // listar
+                List<Inventario> lista = dao.listar();
+                request.setAttribute("listaInventario", lista);
+                request.getRequestDispatcher("vistas/inventario.jsp").forward(request, response);
+                break;
+        }
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        InventarioDAO dao = new InventarioDAO();
-        Inventario inv = new Inventario();
-
+        String id = request.getParameter("id");
         String producto = request.getParameter("producto");
-        String categoria = request.getParameter("categoria");
-        String stockStr = request.getParameter("stock");
-        String unidad = request.getParameter("unidad");
+        int cantidad = Integer.parseInt(request.getParameter("cantidad"));
 
-        try {
-            if (producto != null && categoria != null && stockStr != null && unidad != null) {
-                int stock = Integer.parseInt(stockStr);
-
-                inv.setProducto(producto);
-                inv.setCategoria(categoria);
-                inv.setStock(stock);
-                inv.setUnidad(unidad);
-                inv.setEstado(stock <= 20 ? "Stock bajo" : "Activo");
-
-                boolean exito = dao.registrar(inv);
-
-                if (exito) {
-                    // Redirige con mensaje de éxito
-                    response.sendRedirect(request.getContextPath() + "/vistas/Inventario.jsp?mensaje=ok");
-                    return;
-                }
-            }
-
-            // Si algo falló, redirige con mensaje de error
-            response.sendRedirect(request.getContextPath() + "/vistas/Inventario.jsp?mensaje=error");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/vistas/Inventario.jsp?mensaje=error");
+        Inventario inv = new Inventario();
+        if (id != null && !id.isEmpty()) {
+            inv.setId(Integer.parseInt(id));
         }
-    }
+        inv.setProducto(producto);
+        inv.setCantidad(cantidad);
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // Esta parte puede no ser necesaria si no estás usando GET.
-        InventarioDAO dao = new InventarioDAO();
-        request.setAttribute("lista", dao.listar());
-        request.getRequestDispatcher("vistas/Inventario.jsp").forward(request, response);
+        dao.guardar(inv);
+        response.sendRedirect("InventarioServlet");
     }
 }

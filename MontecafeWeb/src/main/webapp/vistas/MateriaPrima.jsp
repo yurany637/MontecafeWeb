@@ -1,8 +1,15 @@
 
-<%@ page import="modelo.MateriaPrima" %>
-<%@ page import="dao.MateriaPrimaDAO" %>
-<%@ page import="java.util.List" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="modelo.MateriaPrima" %>
+<%
+    String usuario = (String) session.getAttribute("usuario");
+    if (usuario == null) {
+        response.sendRedirect("../index.jsp?error=login");
+        return;
+    }
+    List<MateriaPrima> listaMaterias = (List<MateriaPrima>) request.getAttribute("listaMaterias");
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -10,87 +17,64 @@
     <title>Materia Prima - Montecafe</title>
     <link rel="stylesheet" href="../css/styles.css">
 </head>
-<body>
+<body class="pagina-materia-prima">
 <div class="layout">
-    <div class="sidebar">
-        <h2>Montecafe</h2>
-        <a href="dashboard.jsp">Inicio</a>
-        <a href="proveedores.jsp">Proveedores</a>
-        <a href="materia_prima.jsp" class="active">Materia Prima</a>
-        <a href="inventario.jsp">Inventario</a>
-        <a href="ventas.jsp">Ventas</a>
-        <a href="clientes.jsp">Clientes</a>
-        <a href="reportes.jsp">Reportes</a>
-        <a href="configuracion.jsp">Configuración</a>
-        <a href="index.jsp" class="logout-btn">Cerrar sesión</a>
-    </div>
-
+    <jsp:include page="partials/sidebar.jspf" />
     <div class="main-content">
         <div class="header-top">
-            <h1>Módulo de Materia Prima</h1>
+            <h1>Gestión de Materia Prima</h1>
             <div class="admin-controls">
-                <strong>Admin</strong>
+                <strong><%= usuario %></strong>
+                <a href="../LogoutServlet" class="logout-btn">Cerrar sesión</a>
             </div>
         </div>
-
-        <%
-            String mensaje = request.getParameter("mensaje");
-            if ("ok".equals(mensaje)) {
-        %>
-        <p style="color:green;">Insumo registrado exitosamente.</p>
-        <% } else if ("error".equals(mensaje)) { %>
-        <p style="color:red;">Error al registrar el insumo.</p>
-        <% } %>
-
-        <div class="form">
-            <h2>Registrar Insumo</h2>
+        <div class="form-container">
+            <h2>Registrar Materia Prima</h2>
             <form method="post" action="../MateriaPrimaServlet">
-                <div class="form-group">
-                    <label>Nombre del insumo</label>
-                    <input type="text" name="nombre" required>
-                </div>
-                <div class="form-group">
-                    <label>Unidad</label>
-                    <input type="text" name="unidad" required>
-                </div>
-                <div class="form-group">
-                    <label>Stock inicial</label>
-                    <input type="number" name="stock" required>
-                </div>
-                <button type="submit">Registrar Insumo</button>
+                <input type="hidden" name="accion" value="guardar">
+                <div class="form-group"><label>Nombre</label><input type="text" name="nombre" required></div>
+                <div class="form-group"><label>Cantidad</label><input type="number" name="cantidad" required></div>
+                <div class="form-group"><label>Unidad</label><input type="text" name="unidad" required></div>
+                <div class="form-group"><label>Stock</label><input type="number" name="stock" required></div>
+                <button type="submit">Guardar</button>
             </form>
         </div>
-
-        <table>
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Insumo</th>
-                <th>Unidad</th>
-                <th>Stock</th>
-            </tr>
-            </thead>
-            <tbody>
-            <%
-                try {
-                    MateriaPrimaDAO dao = new MateriaPrimaDAO();
-                    List<MateriaPrima> lista = dao.listar();
-                    for (MateriaPrima m : lista) {
-            %>
-                <tr>
-                    <td><%= m.getId() %></td>
-                    <td><%= m.getNombre() %></td>
-                    <td><%= m.getUnidad() %></td>
-                    <td><%= m.getStock() %></td>
-                </tr>
-            <%
+        <div class="table-container">
+            <h2>Lista de Materias Primas</h2>
+            <table>
+                <thead>
+                    <tr><th>ID</th><th>Nombre</th><th>Cantidad</th><th>Unidad</th><th>Stock</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                <%
+                    if (listaMaterias != null && !listaMaterias.isEmpty()) {
+                        for (MateriaPrima mp : listaMaterias) {
+                %>
+                    <tr>
+                        <td><%= mp.getId() %></td>
+                        <td><%= mp.getNombre() %></td>
+                        <td><%= mp.getCantidad() %></td>
+                        <td><%= mp.getUnidad() %></td>
+                        <td><%= mp.getStock() %></td>
+                        <td>
+                            <form method="get" action="../MateriaPrimaServlet" style="display:inline;">
+                                <input type="hidden" name="accion" value="eliminar">
+                                <input type="hidden" name="id" value="<%= mp.getId() %>">
+                                <button type="submit" onclick="return confirm('¿Eliminar esta materia prima?')">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                <%
+                        }
+                    } else {
+                %>
+                    <tr><td colspan="6">No hay materias primas registradas.</td></tr>
+                <%
                     }
-                } catch (Exception e) {
-                    out.print("<tr><td colspan='4'>Error al listar insumos</td></tr>");
-                }
-            %>
-            </tbody>
-        </table>
+                %>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 </body>

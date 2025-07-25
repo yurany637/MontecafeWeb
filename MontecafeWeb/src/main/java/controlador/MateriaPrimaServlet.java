@@ -3,36 +3,63 @@ package controlador;
 
 import dao.MateriaPrimaDAO;
 import modelo.MateriaPrima;
-
-import javax.servlet.*;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.util.List;
 
 @WebServlet("/MateriaPrimaServlet")
 public class MateriaPrimaServlet extends HttpServlet {
+    private MateriaPrimaDAO dao = new MateriaPrimaDAO();
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        MateriaPrima m = new MateriaPrima();
-        m.setNombre(request.getParameter("nombre"));
-        m.setUnidad(request.getParameter("unidad"));
-        m.setStock(Integer.parseInt(request.getParameter("stock")));
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-        MateriaPrimaDAO dao = new MateriaPrimaDAO();
-        boolean exito = dao.registrar(m);
+        String action = request.getParameter("action");
+        if (action == null) action = "listar";
 
-        if (exito) {
-            response.sendRedirect("vistas/MateriaPrima.jsp?mensaje=ok");
-        } else {
-            response.sendRedirect("vistas/MateriaPrima.jsp?mensaje=error");
+        switch (action) {
+            case "editar":
+                int idEditar = Integer.parseInt(request.getParameter("id"));
+                MateriaPrima materiaEditar = dao.obtenerPorId(idEditar);
+                request.setAttribute("materia", materiaEditar);
+                request.getRequestDispatcher("vistas/materia-prima-form.jsp").forward(request, response);
+                break;
+
+            case "eliminar":
+                int idEliminar = Integer.parseInt(request.getParameter("id"));
+                dao.eliminar(idEliminar);
+                response.sendRedirect("MateriaPrimaServlet");
+                break;
+
+            default: // listar
+                List<MateriaPrima> lista = dao.listar();
+                request.setAttribute("listaMateria", lista);
+                request.getRequestDispatcher("vistas/materia-prima.jsp").forward(request, response);
+                break;
         }
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        MateriaPrimaDAO dao = new MateriaPrimaDAO();
-        request.setAttribute("lista", dao.listar());
-        request.getRequestDispatcher("vistas/MateriaPrima.jsp").forward(request, response);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String id = request.getParameter("id");
+        String nombre = request.getParameter("nombre");
+        int cantidad = Integer.parseInt(request.getParameter("cantidad"));
+        String unidad = request.getParameter("unidad");
+
+        MateriaPrima materia = new MateriaPrima();
+        if (id != null && !id.isEmpty()) {
+            materia.setId(Integer.parseInt(id));
+        }
+        materia.setNombre(nombre);
+        materia.setCantidad(cantidad);
+        materia.setUnidad(unidad);
+
+        dao.guardar(materia);
+        response.sendRedirect("MateriaPrimaServlet");
     }
 }
