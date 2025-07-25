@@ -2,6 +2,7 @@ dao\MateriaPrimaDAO.class
 modelo\Proveedor.class
 com\mycompany\montecafeweb\resources\JakartaEE8Resource.class
 dao\ConfiguracionDAO.class
+controlador\DashboardServlet.class
 dao\VentasDAO.class
 modelo\Inventario.class
 com\mycompany\montecafeweb\JakartaRestConfiguration.class
@@ -14,6 +15,7 @@ controlador\ReporteInventario.class
 controlador\MateriaPrimaServlet.class
 controlador\ProveedorServlet.class
 modelo\Ventas.class
+dao\DashboardDAO.class
 controlador\ConfiguracionServlet.class
 modelo\MateriaPrima.class
 controlador\ReporteVentas.class

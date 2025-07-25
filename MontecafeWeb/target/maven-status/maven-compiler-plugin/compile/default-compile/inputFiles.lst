@@ -11,6 +11,7 @@ C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\Mo
 C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\controlador\ReporteInventario.java
 C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\controlador\ReporteVentas.java
 C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\modelo\Inventario.java
+C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\dao\DashboardDAO.java
 C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\modelo\MateriaPrima.java
 C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\dao\InventarioDAO.java
 C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\controlador\LoginServlet.java
@@ -23,3 +24,4 @@ C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\Mo
 C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\dao\MateriaPrimaDAO.java
 C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\modelo\Usuario.java
 C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\controlador\InventarioServlet.java
+C:\Users\Katherin\Desktop\Yurany\SENA\FASE EJECUCION\GUIA 7\MontecafeWeb-main\MontecafeWeb\src\main\java\controlador\DashboardServlet.java
